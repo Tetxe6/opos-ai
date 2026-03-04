@@ -1,0 +1,6 @@
+# Claves secretas - nunca subir a Git
+config.js
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
