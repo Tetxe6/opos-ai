@@ -84,29 +84,48 @@
 
         <!-- Sección: Test (pages/test.html) -->
         <section id="test" class="section">
-            <div class="page-header">
-                <h1>Generador de Test</h1>
-                <p>Pon a prueba lo que has estudiado con preguntas de opción múltiple</p>
-            </div>
+    <div class="page-header">
+        <h1>Generador de Test</h1>
+        <p>Escribe un tema y la IA generará preguntas personalizadas</p>
+    </div>
 
-            <div id="scoreArea"></div>
+    <div class="card" style="margin-bottom: 20px">
+        <div style="display:flex; gap:10px; align-items:center">
+            <input 
+                id="temaInput"
+                type="text" 
+                placeholder="Ej: La Constitución española de 1978, Derecho Administrativo, Ofimática..."
+                style="flex:1; padding:10px 14px; border:1.5px solid var(--border); border-radius:var(--r-sm);
+                       font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; color:var(--text-1);
+                       background:var(--surface); outline:none; transition:border-color .2s"
+                onfocus="this.style.borderColor='var(--accent)'"
+                onblur="this.style.borderColor='var(--border)'"
+                onkeydown="if(event.key==='Enter') generarNuevoTest()"
+            >
+            <button class="btn btn-primary" id="newTestBtn" onclick="generarNuevoTest()">
+                🧠 Generar test
+            </button>
+        </div>
+    </div>
 
-            <div class="test-topbar">
-                <span class="test-counter" id="testLabel">0 / 3 respondidas</span>
-                <div class="pbar-wrap">
-                    <div class="pbar-fill" id="testBar" style="width:0%"></div>
-                </div>
-            </div>
+    <div id="scoreArea"></div>
 
-            <div id="questionsWrap"></div>
+    <div class="test-topbar">
+        <span class="test-counter" id="testLabel">0 / 3 respondidas</span>
+        <div class="pbar-wrap">
+            <div class="pbar-fill" id="testBar" style="width:0%"></div>
+        </div>
+    </div>
 
-            <div class="test-actions">
-                <button class="btn btn-primary" id="checkBtn" onclick="comprobar()" style="display:none">
-                    ✅ Comprobar respuestas
-                </button>
-                <button class="btn btn-ghost" id="newTestBtn" onclick="generarNuevoTest()">🔄 Nuevo test</button>
-            </div>
-        </section>
+    <div id="questionsWrap"></div>
+
+    <div class="test-actions">
+        <button class="btn btn-primary" id="checkBtn" onclick="comprobar()" style="display:none">
+            ✅ Comprobar respuestas
+        </button>
+        <button class="btn btn-ghost" onclick="generarNuevoTest()">🔄 Repetir test</button>
+    </div>
+</section>
 
         <!-- Sección: Progreso (pages/progreso.html) -->
         <section id="progreso" class="section">

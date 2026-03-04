@@ -129,19 +129,25 @@ let corrected = false;
 
 // Genera preguntas con IA a partir del texto del analizador
 async function generarTestConIA() {
-    const texto = document.getElementById('textoInput').value.trim();
+    const tema = document.getElementById('temaInput').value.trim();
+    const textoAnalizador = document.getElementById('textoInput').value.trim();
 
-    // Si no hay texto en el analizador, usamos preguntas de ejemplo
-    if (!texto) {
+    // Prioridad: campo de tema > texto del analizador > preguntas por defecto
+    let contenido = '';
+    if (tema) {
+        contenido = `Genera preguntas sobre este tema: ${tema}`;
+    } else if (textoAnalizador) {
+        contenido = textoAnalizador;
+    } else {
         return getDefaultQuestions();
     }
 
     const respuestaIA = await llamarGroq(
-        texto,
-        `Eres un experto en oposiciones españolas. Genera exactamente 3 preguntas tipo test basadas en el texto proporcionado.
+        contenido,
+        `Eres un experto en oposiciones españolas. Genera exactamente 5 preguntas tipo test.
 
-        IMPORTANTE: Responde SOLO con un JSON válido, sin texto adicional, sin markdown, sin explicaciones.
-        El formato debe ser exactamente este:
+        IMPORTANTE: Responde SOLO con un JSON válido, sin texto adicional, sin markdown.
+        Formato exacto:
         [
           {
             "text": "Pregunta aquí",
@@ -149,10 +155,10 @@ async function generarTestConIA() {
             "ok": 0
           }
         ]
-        Donde "ok" es el índice (0-3) de la respuesta correcta.`
+        Donde "ok" es el índice (0-3) de la respuesta correcta.
+        Las preguntas deben ser variadas y diferentes entre sí.`
     );
 
-    // Limpiamos la respuesta por si viene con markdown
     const limpio = respuestaIA.replace(/```json|```/g, '').trim();
     return JSON.parse(limpio);
 }
