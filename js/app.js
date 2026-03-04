@@ -1,35 +1,54 @@
 /* ════════════════════════════════════════
    OposAI — app.js
-   Toda la lógica JavaScript de la aplicación
    ════════════════════════════════════════ */
 
 
-/* ════════ NAVEGACIÓN ════════
-   Muestra la sección activa y marca el item del menú
-   ──────────────────────────────────────────────── */
+/* ════════ NAVEGACIÓN ════════ */
 function nav(id, el) {
-    // Ocultar todas las secciones
     document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
-    // Quitar "active" de todos los items del menú
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    // Mostrar la sección seleccionada
     document.getElementById(id).classList.add('visible');
-    // Marcar el item del menú como activo
     el.classList.add('active');
 }
 
 
-/* ════════ ANALIZADOR ════════
-   Lógica del área de texto y generación de resumen
+/* ════════ GROQ API ════════
+   Función central que llama a la IA
    ──────────────────────────────────────────────── */
+async function llamarGroq(mensajeUsuario, prompt_sistema) {
+    const respuesta = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${CONFIG.GROQ_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: 'llama3-8b-8192',
+            messages: [
+                { role: 'system', content: prompt_sistema },
+                { role: 'user',   content: mensajeUsuario }
+            ],
+            temperature: 0.5
+        })
+    });
 
-// Actualiza el contador de caracteres en tiempo real
+    if (!respuesta.ok) {
+        const error = await respuesta.json();
+        throw new Error(error.error?.message || 'Error en la API de Groq');
+    }
+
+    const datos = await respuesta.json();
+    return datos.choices[0].message.content;
+}
+
+
+/* ════════ ANALIZADOR ════════ */
+
 function updateCounter() {
     const n = document.getElementById('textoInput').value.length;
     document.getElementById('charCount').textContent = n.toLocaleString('es-ES');
 }
 
-// Limpia el textarea y el resultado
 function limpiar() {
     document.getElementById('textoInput').value = '';
     updateCounter();
@@ -42,9 +61,7 @@ function limpiar() {
         </div>`;
 }
 
-// Genera el resumen del texto pegado
-// TODO: Conectar con Claude API para resúmenes inteligentes reales
-function generarResumen() {
+async function generarResumen() {
     const texto = document.getElementById('textoInput').value.trim();
 
     if (!texto) {
@@ -52,71 +69,152 @@ function generarResumen() {
         return;
     }
 
-    // Mostrar estado de carga
+    // Estado de carga
     const btn = document.getElementById('analyzeBtn');
     btn.disabled = true;
     btn.innerHTML = '⏳ Analizando...';
 
-    // Simulamos un tiempo de espera (se eliminará cuando conectemos la IA real)
-    setTimeout(() => {
-        btn.disabled = false;
-        btn.innerHTML = '✨ Analizar temario';
+    document.getElementById('resultado').innerHTML = `
+        <div class="card">
+            <div class="empty-state">
+                <div class="icon">🤖</div>
+                <p>La IA está procesando tu texto...</p>
+            </div>
+        </div>`;
+
+    try {
+        const resumen = await llamarGroq(
+            texto,
+            `Eres un asistente experto en preparación de oposiciones españolas.
+            Tu tarea es analizar el texto que te proporciona el opositor y generar:
+            1. Un resumen claro y estructurado en 3-5 puntos clave
+            2. Los conceptos más importantes que debe memorizar
+            3. Una pregunta de repaso al final
+
+            Responde en español, en formato HTML simple usando solo: <p>, <strong>, <ul>, <li>, <br>.
+            No uses markdown, no uses headers como h1/h2, solo HTML básico.`
+        );
 
         const palabras = texto.split(/\s+/).filter(Boolean).length;
-        const preview  = texto.length > 350 ? texto.substring(0, 350) + '…' : texto;
 
         document.getElementById('resultado').innerHTML = `
             <div class="card" style="animation:fadeUp .25s ease">
-                <div class="result-tag">Resumen generado</div>
-                <p class="result-body">${preview}</p>
+                <div class="result-tag">✨ Resumen generado por IA</div>
+                <div class="result-body">${resumen}</div>
                 <div class="result-meta">
-                    <span>📊 <b>${palabras}</b> palabras</span>
+                    <span>📊 <b>${palabras}</b> palabras analizadas</span>
                     <span>⏱ Lectura estimada: <b>${Math.ceil(palabras / 200)} min</b></span>
                 </div>
-                <div class="info-pill">
-                    💡 <b>Próximamente:</b> Conectaremos IA real (Claude API) para generar resúmenes inteligentes automáticos
+            </div>`;
+
+    } catch (error) {
+        document.getElementById('resultado').innerHTML = `
+            <div class="card">
+                <div class="info-pill" style="background:var(--danger-light); color:var(--danger)">
+                    ❌ Error: ${error.message}
                 </div>
             </div>`;
-    }, 1100);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '✨ Analizar temario';
+    }
 }
 
 
-/* ════════ TEST ════════
-   Lógica del generador de preguntas tipo test
-   ──────────────────────────────────────────────── */
+/* ════════ TEST ════════ */
 
-// Banco de preguntas
-// TODO: Generar estas preguntas dinámicamente con IA a partir del temario
-const QUESTIONS = [
-    {
-        text: '¿Cuál es el órgano legislativo principal en España?',
-        opts: ['El Gobierno', 'Las Cortes Generales', 'El Consejo de Estado', 'El Tribunal Constitucional'],
-        ok: 1
-    },
-    {
-        text: '¿En qué año entró en vigor la Constitución española vigente?',
-        opts: ['1975', '1977', '1978', '1982'],
-        ok: 2
-    },
-    {
-        text: '¿Cuántos artículos tiene la Constitución española?',
-        opts: ['139', '159', '169', '196'],
-        ok: 2
-    }
-];
-
-// Estado del test
+let QUESTIONS = [];
 let answers   = {};
 let corrected = false;
 
-// Construye el HTML del test
+// Genera preguntas con IA a partir del texto del analizador
+async function generarTestConIA() {
+    const texto = document.getElementById('textoInput').value.trim();
+
+    // Si no hay texto en el analizador, usamos preguntas de ejemplo
+    if (!texto) {
+        return getDefaultQuestions();
+    }
+
+    const respuestaIA = await llamarGroq(
+        texto,
+        `Eres un experto en oposiciones españolas. Genera exactamente 3 preguntas tipo test basadas en el texto proporcionado.
+
+        IMPORTANTE: Responde SOLO con un JSON válido, sin texto adicional, sin markdown, sin explicaciones.
+        El formato debe ser exactamente este:
+        [
+          {
+            "text": "Pregunta aquí",
+            "opts": ["Opción A", "Opción B", "Opción C", "Opción D"],
+            "ok": 0
+          }
+        ]
+        Donde "ok" es el índice (0-3) de la respuesta correcta.`
+    );
+
+    // Limpiamos la respuesta por si viene con markdown
+    const limpio = respuestaIA.replace(/```json|```/g, '').trim();
+    return JSON.parse(limpio);
+}
+
+function getDefaultQuestions() {
+    return [
+        {
+            text: '¿Cuál es el órgano legislativo principal en España?',
+            opts: ['El Gobierno', 'Las Cortes Generales', 'El Consejo de Estado', 'El Tribunal Constitucional'],
+            ok: 1
+        },
+        {
+            text: '¿En qué año entró en vigor la Constitución española vigente?',
+            opts: ['1975', '1977', '1978', '1982'],
+            ok: 2
+        },
+        {
+            text: '¿Cuántos artículos tiene la Constitución española?',
+            opts: ['139', '159', '169', '196'],
+            ok: 2
+        }
+    ];
+}
+
 function buildTest() {
     corrected = false;
     answers   = {};
     document.getElementById('scoreArea').innerHTML    = '';
     document.getElementById('checkBtn').style.display = 'none';
     updateBar();
+    document.getElementById('questionsWrap').innerHTML = '';
+}
 
+async function generarNuevoTest() {
+    const btn = document.getElementById('newTestBtn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Generando preguntas...';
+
+    document.getElementById('questionsWrap').innerHTML = `
+        <div class="card">
+            <div class="empty-state">
+                <div class="icon">🤖</div>
+                <p>La IA está generando preguntas personalizadas...</p>
+            </div>
+        </div>`;
+
+    try {
+        QUESTIONS = await generarTestConIA();
+        buildTest();
+        renderPreguntas();
+    } catch (error) {
+        // Si falla la IA, usamos preguntas por defecto
+        QUESTIONS = getDefaultQuestions();
+        buildTest();
+        renderPreguntas();
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🔄 Nuevo test';
+    }
+}
+
+function renderPreguntas() {
     document.getElementById('questionsWrap').innerHTML = QUESTIONS.map((q, qi) => `
         <div class="q-card">
             <div class="q-num">Pregunta ${qi + 1} de ${QUESTIONS.length}</div>
@@ -132,47 +230,34 @@ function buildTest() {
     `).join('');
 }
 
-// Gestiona la selección de una opción
 function pick(qi, oi) {
     if (corrected) return;
-
-    // Quitar selección previa de esa pregunta
     QUESTIONS[qi].opts.forEach((_, i) =>
         document.getElementById(`opt-${qi}-${i}`).classList.remove('selected')
     );
-
-    // Marcar la nueva opción como seleccionada
     document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
     answers[qi] = oi;
-
     updateBar();
-
-    // Mostrar botón de comprobar cuando todas estén respondidas
     if (Object.keys(answers).length === QUESTIONS.length)
         document.getElementById('checkBtn').style.display = 'inline-flex';
 }
 
-// Actualiza la barra de progreso del test
 function updateBar() {
     const n   = Object.keys(answers).length;
-    const pct = (n / QUESTIONS.length) * 100;
-    document.getElementById('testBar').style.width      = pct + '%';
-    document.getElementById('testLabel').textContent    = `${n} / ${QUESTIONS.length} respondidas`;
+    const tot = QUESTIONS.length || 3;
+    const pct = (n / tot) * 100;
+    document.getElementById('testBar').style.width   = pct + '%';
+    document.getElementById('testLabel').textContent = `${n} / ${tot} respondidas`;
 }
 
-// Comprueba las respuestas y muestra la puntuación
 function comprobar() {
     corrected = true;
     let hits  = 0;
 
     QUESTIONS.forEach((q, qi) => {
         const sel = answers[qi];
-
-        // Marcar la respuesta correcta en verde
         document.getElementById(`opt-${qi}-${q.ok}`).classList.remove('selected');
         document.getElementById(`opt-${qi}-${q.ok}`).classList.add('correct');
-
-        // Si eligió una incorrecta, marcarla en rojo
         if (sel !== undefined && sel !== q.ok) {
             document.getElementById(`opt-${qi}-${sel}`).classList.add('wrong');
         } else if (sel === q.ok) {
@@ -180,7 +265,6 @@ function comprobar() {
         }
     });
 
-    // Calcular y mostrar el banner de puntuación
     const pct = Math.round((hits / QUESTIONS.length) * 100);
     const cls = pct >= 70 ? 'good' : pct >= 40 ? 'ok' : 'bad';
     const msg = pct >= 70 ? '¡Excelente resultado! Sigue así 🎉'
@@ -199,22 +283,17 @@ function comprobar() {
     document.getElementById('checkBtn').style.display = 'none';
 }
 
-// Reinicia el test desde cero
 function resetTest() {
-    buildTest();
+    generarNuevoTest();
 }
 
 
-/* ════════ PROGRESO ════════
-   Genera los elementos visuales de la sección de progreso
-   ──────────────────────────────────────────────── */
+/* ════════ PROGRESO ════════ */
 
-// Construye la cuadrícula de racha de estudio (últimas 3 semanas)
 function buildStreak() {
     const pattern = [1,1,0,1,1,1,0, 1,1,1,1,0,1,1, 1,1,1,1,1,1,0];
     const days    = ['L','M','X','J','V','S','D'];
     const weeks   = [];
-
     for (let w = 0; w < 3; w++) {
         weeks.push(
             `<div class="week-row">` +
@@ -227,11 +306,9 @@ function buildStreak() {
             `</div>`
         );
     }
-
     document.getElementById('streakGrid').innerHTML = weeks.join('');
 }
 
-// Construye las barras de progreso por tema
 function buildSubjects() {
     const subjects = [
         { name: 'Derecho Constitucional',    pct: 68 },
@@ -240,7 +317,6 @@ function buildSubjects() {
         { name: 'Informática básica',         pct: 91 },
         { name: 'Ofimática',                  pct: 33 },
     ];
-
     document.getElementById('subjectBars').innerHTML = subjects.map(s => `
         <div class="subj-row">
             <div class="subj-head">
@@ -252,7 +328,6 @@ function buildSubjects() {
             </div>
         </div>`).join('');
 
-    // Animamos las barras tras renderizar
     setTimeout(() => {
         document.querySelectorAll('.subj-fill').forEach(el => {
             el.style.width = el.dataset.pct + '%';
@@ -260,7 +335,6 @@ function buildSubjects() {
     }, 120);
 }
 
-// Construye el historial de tests recientes
 function buildHistory() {
     const rows = [
         { topic: 'Derecho Constitucional',    date: 'Hoy, 10:30',   score: 90, cls: 'green',  label: 'Aprobado'   },
@@ -269,13 +343,7 @@ function buildHistory() {
         { topic: 'Informática básica',         date: 'Hace 3 días',  score: 30, cls: 'red',    label: 'Suspendido' },
         { topic: 'Ofimática',                  date: 'Hace 4 días',  score: 80, cls: 'green',  label: 'Aprobado'   },
     ];
-
-    const scoreColor = {
-        green:  'var(--success)',
-        orange: 'var(--warn)',
-        red:    'var(--danger)'
-    };
-
+    const scoreColor = { green: 'var(--success)', orange: 'var(--warn)', red: 'var(--danger)' };
     document.getElementById('testHistory').innerHTML = rows.map(r => `
         <div class="hist-row">
             <span style="font-size:18px">📝</span>
@@ -289,10 +357,12 @@ function buildHistory() {
 }
 
 
-/* ════════ INIT ════════
-   Se ejecuta al cargar la página
-   ──────────────────────────────────────────────── */
-buildTest();
+/* ════════ INIT ════════ */
 buildStreak();
 buildSubjects();
 buildHistory();
+
+// Cargar test con preguntas por defecto al inicio
+QUESTIONS = getDefaultQuestions();
+buildTest();
+renderPreguntas();
