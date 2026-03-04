@@ -23,7 +23,7 @@ async function llamarGroq(mensajeUsuario, prompt_sistema) {
             'Authorization': `Bearer ${CONFIG.GROQ_API_KEY}`
         },
         body: JSON.stringify({
-            model: 'llama3-8b-8192',
+            model: 'llama-3.3-70b-versatile',
             messages: [
                 { role: 'system', content: prompt_sistema },
                 { role: 'user',   content: mensajeUsuario }
