@@ -7,11 +7,11 @@ function generarResumen(){
         return;
     }
 
-    let resumen = texto.substring(0,150) + "...";
+    let resumen = texto.substring(0,200) + "...";
 
     document.getElementById("resultado").innerHTML = `
         <div class="card">
-            <h3>📚 Resumen</h3>
+            <h3>📚 Resumen generado</h3>
             <p>${resumen}</p>
         </div>
     `;
