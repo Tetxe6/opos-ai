@@ -1,5 +1,41 @@
-<!-- Componente: Navbar -->
-<div class="navbar">
-    🎓 OposAI
-    <span>Tu asistente de estudio inteligente</span>
-</div>
+<!-- ════════════════════════════════════════
+     OposAI — components/navbar.html
+     Fragmento del sidebar de navegación.
+     Este código está incluido en index.html
+     ════════════════════════════════════════ -->
+
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-icon">🎓</div>
+        <span class="brand-name">OposAI</span>
+    </div>
+
+    <span class="nav-label">Herramientas</span>
+
+    <div class="nav-item active" onclick="nav('analizador', this)">
+        <span class="nav-icon">📝</span> Analizador
+    </div>
+    <div class="nav-item" onclick="nav('test', this)">
+        <span class="nav-icon">🧪</span> Generador de Test
+        <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" onclick="nav('progreso', this)">
+        <span class="nav-icon">📊</span> Mi Progreso
+    </div>
+
+    <div style="margin-top:22px; padding-top:16px; border-top:1px solid var(--border)">
+        <span class="nav-label">Próximamente</span>
+        <div class="nav-item disabled"><span class="nav-icon">📁</span> Mis Temarios</div>
+        <div class="nav-item disabled"><span class="nav-icon">📄</span> Exportar a PDF</div>
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="user-row">
+            <div class="avatar">A</div>
+            <div>
+                <div class="user-name">Alejandro García</div>
+                <div class="user-plan">Plan Gratuito</div>
+            </div>
+        </div>
+    </div>
+</aside>

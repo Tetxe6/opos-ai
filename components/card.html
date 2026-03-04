@@ -1,8 +1,33 @@
-<!-- Componente: Card de resultado -->
-<!-- Se genera dinámicamente desde app.js -->
-<!-- Estructura esperada:
+<!-- ════════════════════════════════════════
+     OposAI — components/card.html
+     Ejemplo de uso del componente .card
+     ════════════════════════════════════════ -->
+
+<!-- Tarjeta básica — usar clase .card -->
 <div class="card">
-    <h3>Título</h3>
-    <p>Contenido</p>
+    <p>Contenido de la tarjeta aquí</p>
 </div>
--->
+
+<!-- Tarjeta con título -->
+<div class="card">
+    <div class="card-title">📚 Título de la tarjeta</div>
+    <p>Contenido de la tarjeta aquí</p>
+</div>
+
+<!-- Tarjeta con resultado de análisis -->
+<div class="card">
+    <div class="result-tag">Resultado</div>
+    <p class="result-body">Texto del resultado aquí...</p>
+    <div class="result-meta">
+        <span>📊 <b>120</b> palabras</span>
+        <span>⏱ Lectura: <b>1 min</b></span>
+    </div>
+</div>
+
+<!-- Estado vacío (empty state) -->
+<div class="card">
+    <div class="empty-state">
+        <div class="icon">📄</div>
+        <p>Mensaje de estado vacío aquí</p>
+    </div>
+</div>
