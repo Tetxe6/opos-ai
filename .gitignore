@@ -4,3 +4,6 @@ config.js
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+# Base de datos de preguntas - no subir
+Frontend/BasesDeDatos/
