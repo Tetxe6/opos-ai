@@ -163,24 +163,14 @@ async function generarTestConIA() {
     return JSON.parse(limpio);
 }
 
+
 function getDefaultQuestions() {
-    return [
-        {
-            text: '¿Cuál es el órgano legislativo principal en España?',
-            opts: ['El Gobierno', 'Las Cortes Generales', 'El Consejo de Estado', 'El Tribunal Constitucional'],
-            ok: 1
-        },
-        {
-            text: '¿En qué año entró en vigor la Constitución española vigente?',
-            opts: ['1975', '1977', '1978', '1982'],
-            ok: 2
-        },
-        {
-            text: '¿Cuántos artículos tiene la Constitución española?',
-            opts: ['139', '159', '169', '196'],
-            ok: 2
-        }
-    ];
+    const mezcladas = [...PREGUNTAS_OFICIALES].sort(() => Math.random() - 0.5);
+    return mezcladas.slice(0, 10).map(p => ({
+        text: p.texto,
+        opts: p.opciones,
+        ok:   p.correcta
+    }));
 }
 
 function buildTest() {
@@ -368,7 +358,6 @@ buildStreak();
 buildSubjects();
 buildHistory();
 
-// Cargar test con preguntas por defecto al inicio
 QUESTIONS = getDefaultQuestions();
 buildTest();
 renderPreguntas();
