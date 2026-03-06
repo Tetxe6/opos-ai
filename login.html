@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OposAI — Acceder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-body">
+
+    <div class="auth-wrap">
+
+        <!-- LEFT PANEL -->
+        <div class="auth-left">
+            <a href="index.html" class="auth-back">← Volver</a>
+            <div class="auth-brand">
+                <div class="brand-dot"></div>
+                <span>OposAI</span>
+            </div>
+            <blockquote class="auth-quote">
+                "La constancia es la virtud por la que todas las otras virtudes dan su fruto."
+            </blockquote>
+            <div class="auth-conv-badge">✦ Auxiliar Administrativo del Estado</div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="auth-right">
+
+            <!-- TABS -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Entrar</button>
+                <button class="auth-tab" id="tab-registro" onclick="switchTab('registro')">Registro</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div id="form-login">
+                <h2 class="auth-title">Bienvenido de nuevo</h2>
+                <p class="auth-subtitle">Continúa donde lo dejaste</p>
+
+                <div class="field">
+                    <label>Email</label>
+                    <input type="email" id="login-email" placeholder="tu@email.com" autocomplete="email">
+                </div>
+                <div class="field">
+                    <label>Contraseña</label>
+                    <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"
+                        onkeydown="if(event.key==='Enter') doLogin()">
+                </div>
+
+                <div id="login-error" class="auth-error" style="display:none"></div>
+
+                <button class="btn-auth" onclick="doLogin()">Entrar →</button>
+
+                <p class="auth-switch">¿No tienes cuenta? <a onclick="switchTab('registro')">Regístrate gratis</a></p>
+            </div>
+
+            <!-- REGISTRO FORM -->
+            <div id="form-registro" style="display:none">
+                <h2 class="auth-title">Empieza hoy</h2>
+                <p class="auth-subtitle">Crea tu cuenta gratuita</p>
+
+                <div class="field">
+                    <label>Nombre</label>
+                    <input type="text" id="reg-nombre" placeholder="Tu nombre">
+                </div>
+                <div class="field">
+                    <label>Email</label>
+                    <input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email">
+                </div>
+                <div class="field">
+                    <label>Contraseña</label>
+                    <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres"
+                        onkeydown="if(event.key==='Enter') doRegistro()">
+                </div>
+
+                <div id="reg-error" class="auth-error" style="display:none"></div>
+
+                <button class="btn-auth" onclick="doRegistro()">Crear cuenta →</button>
+
+                <p class="auth-switch">¿Ya tienes cuenta? <a onclick="switchTab('login')">Inicia sesión</a></p>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Si viene con ?modo=registro abrimos el tab de registro directamente
+        if (new URLSearchParams(location.search).get('modo') === 'registro') {
+            switchTab('registro');
+        }
+    </script>
+</body>
+</html>

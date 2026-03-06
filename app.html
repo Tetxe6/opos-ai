@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OposAI — Tests</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="app-body">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-dot"></div>
+            <span>OposAI</span>
+        </div>
+
+        <span class="nav-label">Tests</span>
+
+        <div class="nav-item active" onclick="nav('tests', this)">
+            <span class="nav-icon">📋</span> Por convocatoria
+        </div>
+        <div class="nav-item" onclick="nav('progreso', this)">
+            <span class="nav-icon">📊</span> Mi progreso
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-row" onclick="cerrarSesion()">
+                <div class="avatar" id="userAvatar">A</div>
+                <div>
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-plan">Plan Gratuito · Cerrar sesión</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- ══════ SECCIÓN: TESTS ══════ -->
+        <section id="tests" class="section visible">
+            <div class="page-header">
+                <h1>Convocatorias oficiales</h1>
+                <p>Auxiliar Administrativo del Estado · Preguntas reales de examen</p>
+            </div>
+
+            <!-- Vista: selector de convocatoria -->
+            <div id="vistaSelector">
+                <div class="conv-grid" id="convGrid">
+                    <!-- Se genera con JS -->
+                </div>
+            </div>
+
+            <!-- Vista: test activo -->
+            <div id="vistaTest" style="display:none">
+
+                <div class="test-header">
+                    <button class="btn-back" onclick="volverSelector()">← Volver</button>
+                    <div class="test-header-info">
+                        <span id="testTitulo" class="test-titulo"></span>
+                        <span id="testSubtitulo" class="test-subtitulo"></span>
+                    </div>
+                </div>
+
+                <div id="scoreArea"></div>
+
+                <div class="test-topbar">
+                    <span class="test-counter" id="testLabel">0 / 0 respondidas</span>
+                    <div class="pbar-wrap">
+                        <div class="pbar-fill" id="testBar" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <div id="questionsWrap"></div>
+
+                <div class="test-actions">
+                    <button class="btn btn-primary" id="checkBtn" onclick="comprobar()" style="display:none">
+                        ✅ Ver resultados
+                    </button>
+                    <button class="btn btn-ghost" onclick="repetirTest()">🔄 Repetir</button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ══════ SECCIÓN: PROGRESO ══════ -->
+        <section id="progreso" class="section">
+            <div class="page-header">
+                <h1>Mi progreso</h1>
+                <p>Resultados y estadísticas de tus tests</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🧪</div>
+                    <div class="stat-value" id="statTests">0</div>
+                    <div class="stat-label">Tests completados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-value" id="statMedia">—</div>
+                    <div class="stat-label">Puntuación media</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" id="statMejor">—</div>
+                    <div class="stat-label">Mejor resultado</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-value" id="statConvs">0</div>
+                    <div class="stat-label">Convocatorias hechas</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🕐 Historial de tests</div>
+                <div id="testHistory">
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <p>Aún no has completado ningún test</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="data/preguntas.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
