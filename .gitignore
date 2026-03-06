@@ -7,3 +7,5 @@ Thumbs.db
 
 # Base de datos de preguntas - no subir
 BasesDeDatos/
+# Sesiones y datos de usuario (si en el futuro usas backend)
+.env
