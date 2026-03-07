@@ -3,79 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OposAI — Prepara tu oposición con inteligencia</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>OposAI — Tu asistente de oposiciones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="landing-body">
+<body>
 
-    <!-- NAV -->
-    <nav class="landing-nav">
-        <div class="nav-brand">
-            <div class="brand-dot"></div>
-            <span>OposAI</span>
-        </div>
-        <a href="login.html" class="nav-cta">Entrar →</a>
-    </nav>
+    <!-- ════════════════════════════════════
+         SIDEBAR
+         ════════════════════════════════════ -->
+    <aside class="sidebar">
 
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-badge">✦ Auxiliar Administrativo del Estado</div>
-        <h1 class="hero-title">
-            Practica con preguntas<br>
-            <em>reales de examen</em>
-        </h1>
-        <p class="hero-sub">
-            Tests oficiales desde 2015. Organizados por convocatoria.<br>
-            Sigue tu progreso. Aprueba.
-        </p>
-        <div class="hero-actions">
-            <a href="login.html?modo=registro" class="btn-hero-primary">Empezar gratis</a>
-            <a href="login.html" class="btn-hero-ghost">Ya tengo cuenta</a>
+        <div class="brand">
+            <div class="brand-icon">🎓</div>
+            <span class="brand-name">OposAI</span>
         </div>
 
-        <div class="hero-stats">
-            <div class="hstat">
-                <span class="hstat-num">+700</span>
-                <span class="hstat-label">Preguntas oficiales</span>
+        <span class="nav-label">Herramientas</span>
+
+        <div class="nav-item active" onclick="nav('analizador', this)">
+            <span class="nav-icon">📝</span> Analizador
+        </div>
+        <div class="nav-item" onclick="nav('test', this)">
+            <span class="nav-icon">🧪</span> Generador de Test
+        </div>
+        <div class="nav-item" onclick="nav('progreso', this)">
+            <span class="nav-icon">📊</span> Mi Progreso
+        </div>
+
+        <hr class="nav-divider">
+
+        <span class="nav-label">Próximamente</span>
+        <div class="nav-item disabled">
+            <span class="nav-icon">📁</span> Mis Temarios
+            <span class="nav-new">Soon</span>
+        </div>
+        <div class="nav-item disabled">
+            <span class="nav-icon">📄</span> Exportar a PDF
+            <span class="nav-new">Soon</span>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-row">
+                <div class="avatar">A</div>
+                <div>
+                    <div class="user-name">Alejandro García</div>
+                    <div class="user-plan">Plan Gratuito</div>
+                </div>
             </div>
-            <div class="hstat-divider"></div>
-            <div class="hstat">
-                <span class="hstat-num">12</span>
-                <span class="hstat-label">Convocatorias</span>
-            </div>
-            <div class="hstat-divider"></div>
-            <div class="hstat">
-                <span class="hstat-num">100%</span>
-                <span class="hstat-label">Gratuito ahora</span>
-            </div>
         </div>
-    </section>
 
-    <!-- FEATURES -->
-    <section class="features">
-        <div class="feat-card">
-            <div class="feat-icon">📋</div>
-            <h3>Exámenes reales</h3>
-            <p>Todas las convocatorias oficiales desde 2015, tanto turno libre como promoción interna.</p>
-        </div>
-        <div class="feat-card">
-            <div class="feat-icon">📊</div>
-            <h3>Tu progreso</h3>
-            <p>Ve cuánto has mejorado por convocatoria y qué preguntas te cuestan más.</p>
-        </div>
-        <div class="feat-card">
-            <div class="feat-icon">🎯</div>
-            <h3>Modo simulacro</h3>
-            <p>Reproduce las condiciones reales del examen con tiempo límite y penalizaciones.</p>
-        </div>
-    </section>
+    </aside>
 
-    <!-- FOOTER -->
-    <footer class="landing-footer">
-        <span>© 2025 OposAI</span>
-        <span>Hecho para opositores, por opositores</span>
-    </footer>
+    <!-- ════════════════════════════════════
+         CONTENIDO PRINCIPAL
+         ════════════════════════════════════ -->
+    <main class="main">
+
+
+        <!-- ───────── SECCIÓN: ANALIZADOR ───────── -->
+        <section id="analizador" class="section visible">
+
+            <div class="page-header">
+                <h1>Analizar temario</h1>
+                <p>Pega cualquier texto de estudio y obtén un resumen estructurado al instante</p>
+            </div>
+
+            <!-- Alerta de validación (oculta por defecto) -->
+            <div id="inputAlert" class="alert alert-warn" style="display:none"></div>
+
+            <div class="card">
+                <textarea
+                    id="textoInput"
+                    class="input-area"
+                    placeholder="Pega aquí tu temario, apuntes o cualquier texto de estudio…"
+                    oninput="updateCounter()"
+                ></textarea>
+                <div class="char-counter"><span id="charCount">0</span> caracteres</div>
+                <div class="toolbar">
+                    <button class="btn btn-primary" id="analyzeBtn" onclick="generarResumen()">
+                        ✨ Analizar temario
+                    </button>
+                    <button class="btn btn-ghost" onclick="limpiar()">
+                        🗑 Limpiar
+                    </button>
+                </div>
+            </div>
+
+            <div id="resultado" style="margin-top:16px"></div>
+
+        </section>
+
+
+        <!-- ───────── SECCIÓN: TEST ───────── -->
+        <section id="test" class="section">
+
+            <div class="page-header">
+                <h1>Generador de Test</h1>
+                <p>Escribe un tema y la IA generará preguntas personalizadas para ti</p>
+            </div>
+
+            <!-- Input de tema + botón -->
+            <div class="card" style="margin-bottom:16px">
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+                    <input
+                        id="temaInput"
+                        type="text"
+                        class="tema-input"
+                        placeholder="Ej: Constitución española 1978, Derecho Administrativo, Ofimática…"
+                        onkeydown="if(event.key==='Enter') generarNuevoTest()"
+                    >
+                    <button class="btn btn-primary" id="newTestBtn" onclick="generarNuevoTest()">
+                        🧠 Generar test
+                    </button>
+                </div>
+            </div>
+
+            <!-- Banner de puntuación -->
+            <div id="scoreArea"></div>
+
+            <!-- Barra de progreso -->
+            <div class="test-topbar">
+                <span class="test-counter" id="testLabel">0 / 0 respondidas</span>
+                <div class="pbar-wrap">
+                    <div class="pbar-fill" id="testBar" style="width:0%"></div>
+                </div>
+            </div>
+
+            <!-- Preguntas -->
+            <div id="questionsWrap"></div>
+
+            <!-- Acciones -->
+            <div class="test-actions">
+                <button class="btn btn-primary" id="checkBtn" onclick="comprobar()" style="display:none">
+                    ✅ Comprobar respuestas
+                </button>
+                <button class="btn btn-ghost" onclick="generarNuevoTest()">
+                    🔄 Nuevo test
+                </button>
+            </div>
+
+        </section>
+
+
+        <!-- ───────── SECCIÓN: PROGRESO ───────── -->
+        <section id="progreso" class="section">
+
+            <div class="page-header">
+                <h1>Mi Progreso</h1>
+                <p>Racha de estudio, resultados y avance por temas</p>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value">7</div>
+                    <div class="stat-label">Días de racha</div>
+                    <div class="stat-delta">↑ Mejor racha: 12 días</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-value">23</div>
+                    <div class="stat-label">Textos analizados</div>
+                    <div class="stat-delta">↑ +5 esta semana</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🧪</div>
+                    <div class="stat-value">41</div>
+                    <div class="stat-label">Tests completados</div>
+                    <div class="stat-delta">↑ +8 esta semana</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-value">74%</div>
+                    <div class="stat-label">Puntuación media</div>
+                    <div class="stat-delta neutral">↔ Sin cambios</div>
+                </div>
+            </div>
+
+            <!-- Racha + Temas -->
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-title">📅 Racha — últimas 3 semanas</div>
+                    <div class="streak-wrap" id="streakGrid"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📚 Avance por temas</div>
+                    <div id="subjectBars"></div>
+                </div>
+            </div>
+
+            <!-- Historial -->
+            <div class="card">
+                <div class="card-title">🕐 Tests recientes</div>
+                <div id="testHistory"></div>
+            </div>
+
+        </section>
+
+
+    </main>
+
+    <!-- ════════ SCRIPTS ════════
+         Orden importante: primero config, luego datos, luego app -->
+    <script src="config.js" onerror="console.warn('config.js no encontrado — modo demo activo')"></script>
+    <script src="BasesDeDatos/preguntas.js" onerror="console.warn('preguntas.js no encontrado — usando preguntas de ejemplo')"></script>
+    <script src="js/app.js"></script>
 
 </body>
 </html>
